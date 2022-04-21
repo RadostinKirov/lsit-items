@@ -82,3 +82,23 @@ section.buttons {
     position: absolute;
     top: -40px;
 }
+
+.show-section{
+    position: relative;
+}
+
+#err-validation{
+    position: absolute;
+    top: 32px;
+    left: 14px;
+    font-weight: 600;
+    color: red;
+    font-size: 18px;
+}
+
+#delete-message{
+    position: absolute;
+    right: 126px;
+    top: -10px;
+    color: red;
+}

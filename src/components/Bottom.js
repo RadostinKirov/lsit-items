@@ -1,37 +1,42 @@
-const Bottom = () => {
-    return (
-        <section className="results">
+import store from "../store/store";
+import Post from "./Post";
+import React from "react";
+import { connect } from 'react-redux';
 
-            <article>
-                <h2>sunt aut facere repellat provident occaecati excepturi optio reprehenderit</h2>
-                <p>quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas
-                    totam\nnostrum rerum est autem sunt rem eveniet architecto</p>
-                <button>Delete</button>
-            </article>
+class Bottom extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            posts: store.getState().dataToPrint
+        };
+    }
 
-            <article>
-                <h2>sunt aut facere repellat provident occaecati excepturi optio reprehenderit</h2>
-                <p>quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas
-                    totam\nnostrum rerum est autem sunt rem eveniet architecto</p>
-                <button>Delete</button>
-            </article>
 
-            <article>
-                <h2>sunt aut facere repellat provident occaecati excepturi optio reprehenderit</h2>
-                <p>quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas
-                    totam\nnostrum rerum est autem sunt rem eveniet architecto</p>
-                <button>Delete</button>
-            </article>
 
-            <article>
-                <h2>sunt aut facere repellat provident occaecati excepturi optio reprehenderit</h2>
-                <p>quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas
-                    totam\nnostrum rerum est autem sunt rem eveniet architecto</p>
-                <button>Delete</button>
-            </article>
-        </section>
+    render() {
+        // const mapStateToProps = state => ({ posts: state.dataToPrint });
+        console.log(this.props)
+        const { posts } = this.props;
+         console.log('posts -> ',posts)
+        
+        return (
+            <section className="results">
 
-    )
+                {
+                    posts?.length > 0 
+                        ? posts.map(x => <Post key={x.id} post={x} />)
+                        : ''
+                }
+
+            </section>
+        )
+    }
 }
 
-export default Bottom;
+const mapStateToProps = (state) => {
+    return {
+        posts: state.dataToPrint
+    }
+}
+
+export default connect(mapStateToProps)(Bottom);

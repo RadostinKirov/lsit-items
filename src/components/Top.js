@@ -9,7 +9,8 @@ class Top extends React.Component {
         this.state = {
             inputGet: '',
             inputShow: '',
-            loading: false
+            loading: false,
+            errValidation: ''
         };
     }
 
@@ -28,63 +29,103 @@ class Top extends React.Component {
     }
 
     onClickGet = () => {
-        if (this.state.inputGet === "all") {
-           this.setState({loading: true})
-            try {
-                getAllPosts()
-                    .then(res => {
-                        store.dispatch(
-                            {
-                                type: "postsLoaded",
-                                payload: res
-                            }
-                        )
-                        this.setState({loading: false});
-                        console.log(store.getState());
-                    })
+        if (this.state.inputGet) {
+            if (this.state.inputGet === "all") {
+                this.setState({ loading: true })
+                try {
+                    getAllPosts()
+                        .then(res => {
+                           
+                            store.dispatch(
+                                {
+                                    type: "postsLoaded",
+                                    payload: { data: res }
+                                }
+                            )
+                            this.setState({ loading: false });
+                            console.log("saved in store -> ", store.getState());
+                        })
 
 
-            } catch (err) {
-                throw err;
-            }
-        } else {
-            const inputID = this.state.inputGet;
-            if (isNaN(inputID)) {
-                console.log('not a number');
-            } else {
-                this.setState({loading: true});
-              try{
-                   getPostById(inputID)
-                    .then(res => {
-                        store.dispatch(
-                            {
-                                type: "postsLoaded",
-                                payload: res
-                            }
-                        )
-                        this.setState({loading: false})
-                        console.log(store.getState())
-                    })
-                }catch(err){
+                } catch (err) {
+                    console.log(err)
                     throw err;
                 }
+            } else {
+                const inputID = this.state.inputGet;
+                if (isNaN(inputID)) {
+                    console.log('not a number');
+                } else {
+                    this.setState({ loading: true });
+                    try {
+                        getPostById(inputID)
+                            .then(res => {
+                                store.dispatch(
+                                    {
+                                        type: "postsLoaded",
+                                        payload: { data: [res] }
+                                    }
+                                )
+                                this.setState({ loading: false })
+                                console.log("saved in store -> ", store.getState())
+                            })
+                    } catch (err) {
+                        throw err;
+                    }
+                }
             }
+        }
+    }
+
+    onClickShow = () => {
+        let dataToPrint = store.getState().data;
+        const inputShow = this.state.inputShow;
+        if (!inputShow) {
+            this.setState({ errValidation: 'въведи "all ,1, 2, 3 ..."' })
+        } else if (inputShow === "all") {
+            this.setState({errValidation: ''});
+            store.dispatch(
+                {
+                    type: "postsToPrint",
+                    payload: { dataToPrint }
+                }
+            )
+            console.log(store.getState())
+        } else if (isNaN(inputShow)) {
+            console.log('not a number');
+        } else {
+            this.setState({errValidation: ''});
+            const id = inputShow;
+            console.log('checkpoint1 -> ', dataToPrint)
+            dataToPrint = dataToPrint.filter(post => post.userId === Number(id));
+            if(dataToPrint.length === 0){
+                this.setState({errValidation: 'няма такъв запис'});
+                return
+            }
+            store.dispatch(
+                {
+                    type: "postsToPrint",
+                    payload: { dataToPrint }
+                }
+            )
+            console.log(store.getState())
         }
     }
 
     render() {
         return (
             <section className="buttons">
-               
+
                 {this.state.loading ? <h1 id="loading-msg">Loading...</h1> : ''}
-               
+
                 <div className="get-section">
                     <input onChange={this.onChangeGetHandler} value={this.state.inputGet} type="text" />
                     <button onClick={this.onClickGet} >GET</button>
                 </div>
                 <div className="show-section">
                     <input onChange={this.onChangeShowHandler} value={this.state.inputShow} type="text" />
-                    <button >SHOW</button>
+                    <button onClick={this.onClickShow} >SHOW</button>
+                    {this.state.errValidation ? <h1 id="err-validation">{this.state.errValidation}</h1> : ''}
                 </div>
                 <hr className="line" />
             </section>
